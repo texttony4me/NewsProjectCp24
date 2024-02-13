@@ -1,15 +1,13 @@
-
+// 
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, Button, ScrollView, Image } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, ScrollView, Image, Linking } from 'react-native';
 
 export default function App() {
   const [query, setQuery] = useState('');
-  const [searchEnabled, setSearchEnabled] = useState(false);
   const [news, setNews] = useState([]);
 
   const handleInputChange = (text) => {
     setQuery(text);
-    setSearchEnabled(text.length > 0);
   };
 
   const searchNews = async () => {
@@ -23,33 +21,49 @@ export default function App() {
     }
   };
 
+  const getNews = async () => {
+    try {
+      const response = await fetch(`https://newsapi.org/v2/everything?q=keyword&apiKey=fe569913525e48e09b9526fed44a8e2b&pageSize=5`);
+      const data = await response.json();
+      setNews(data.articles);
+    } catch (error) {
+      console.error('Error fetching news:', error);
+    }
+  };
+
   const renderNews = () => {
     return news.map((article, index) => (
       <View key={index} style={styles.articleContainer}>
         <Text style={styles.articleTitle}>{article.title}</Text>
         <Text style={styles.articleAuthor}>{article.author}</Text>
         <Image source={{ uri: article.urlToImage }} style={styles.articleImage} />
-        <Text style={styles.articleUrl}>{article.url}</Text>
+        <Text style={styles.articleUrl} onPress={() => Linking.openURL(article.url)}>
+          {article.url}
+        </Text>
       </View>
     ));
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>News Project</Text>
+      <Text style={styles.header}>NewsApp by ANwabueze</Text>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Enter your query"
+          placeholder="Search"
           value={query}
           onChangeText={handleInputChange}
         />
         <Button
           title="Search"
           onPress={searchNews}
-          disabled={!searchEnabled}
+          disabled={!query.trim()}
         />
       </View>
+      <Button
+        title="Get News"
+        onPress={getNews}
+      />
       <ScrollView style={styles.newsContainer}>
         {news.length > 0 ? renderNews() : <Text>No news to display</Text>}
       </ScrollView>
@@ -103,5 +117,6 @@ const styles = StyleSheet.create({
   },
   articleUrl: {
     color: 'blue',
+    textDecorationLine: 'underline',
   },
 });
