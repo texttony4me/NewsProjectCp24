@@ -1,24 +1,59 @@
 // 
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, Button, ScrollView, Image, Linking } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, ScrollView, Image, Linking, Switch } from 'react-native';
 
 export default function App() {
   const [query, setQuery] = useState('');
   const [news, setNews] = useState([]);
+  const [toDate, setToDate] = useState('');
+  const [fromDate, setFromDate] = useState('');
+  const [useDateConstraints, setUseDateConstraints] = useState(false);
 
   const handleInputChange = (text) => {
     setQuery(text);
   };
 
+  const handleFromDateChange = (text) => {
+    setFromDate(text);
+  };
+
+  const handleToDateChange = (text) => {
+    setToDate(text);
+  };
+
+  const handleToggleDateConstraints = () => {
+    setUseDateConstraints((prev) => !prev);
+  };
+
+
   const searchNews = async () => {
     if (query.trim() === '') return;
+
+    if (useDateConstraints && (!validateDate(fromDate) || !validateDate(toDate))) {
+      alert('Please enter valid dates in the format YYYY-MM-DD');
+      return;
+    }
+
     try {
-      const response = await fetch(`https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&apiKey=fe569913525e48e09b9526fed44a8e2b&pageSize=5`);
+
+      let url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}`;
+
+      if (useDateConstraints) {
+        url += `&from=${fromDate}&to=${toDate}&sortBy=popularity`;
+      }
+
+      url += '&apiKey=fe569913525e48e09b9526fed44a8e2b';
+
+      const response = await fetch(url);
       const data = await response.json();
       setNews(data.articles);
     } catch (error) {
       console.error('Error fetching news:', error);
     }
+  };
+
+  const validateDate = (date) => {
+    return /^\d{4}-\d{2}-\d{2}$/.test(date);
   };
 
   const getNews = async () => {
@@ -54,10 +89,35 @@ export default function App() {
           value={query}
           onChangeText={handleInputChange}
         />
+
+</View>
+      {useDateConstraints && (
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.dateInput}
+            placeholder="From Date (YYYY-MM-DD)"
+            value={fromDate}
+            onChangeText={handleFromDateChange}
+          />
+          <TextInput
+            style={styles.dateInput}
+            placeholder="To Date (YYYY-MM-DD)"
+            value={toDate}
+            onChangeText={handleToDateChange}
+          />
+        </View>
+      )}
+      <View style={styles.switchContainer}>
+        <Text>Set Date?</Text>
+        <Switch
+          value={useDateConstraints}
+          onValueChange={handleToggleDateConstraints}
+        />
+      
         <Button
           title="Search"
           onPress={searchNews}
-          disabled={!query.trim()}
+          disabled={!query.trim() || (useDateConstraints && (!fromDate.trim() || !toDate.trim()))}
         />
       </View>
       <Button
@@ -94,6 +154,19 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     paddingHorizontal: 10,
     marginRight: 10,
+  },
+
+  dateInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    paddingHorizontal: 10,
+    marginRight: 10,
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   newsContainer: {
     flex: 1,
