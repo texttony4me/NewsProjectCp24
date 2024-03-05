@@ -95,13 +95,13 @@ export default function App() {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.dateInput}
-            placeholder="From Date (YYYY-MM-DD)"
+            placeholder="From (YYYY-MM-DD)"
             value={fromDate}
             onChangeText={handleFromDateChange}
           />
           <TextInput
             style={styles.dateInput}
-            placeholder="To Date (YYYY-MM-DD)"
+            placeholder="To (YYYY-MM-DD)"
             value={toDate}
             onChangeText={handleToDateChange}
           />
