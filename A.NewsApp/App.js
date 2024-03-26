@@ -1,6 +1,7 @@
 // 
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, Button, ScrollView, Image, Linking, Switch } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, ScrollView, Image, Linking, Switch,  } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 
 export default function App() {
   const [query, setQuery] = useState('');
@@ -8,6 +9,7 @@ export default function App() {
   const [toDate, setToDate] = useState('');
   const [fromDate, setFromDate] = useState('');
   const [useDateConstraints, setUseDateConstraints] = useState(false);
+  const [country, setCountry] = useState('us');
 
   const handleInputChange = (text) => {
     setQuery(text);
@@ -23,6 +25,13 @@ export default function App() {
 
   const handleToggleDateConstraints = () => {
     setUseDateConstraints((prev) => !prev);
+  };
+
+
+  const handleCountryChange = (value) => {
+    setCountry(value);
+    searchNewsByCountry();
+    
   };
 
 
@@ -44,6 +53,14 @@ export default function App() {
 
       url += '&apiKey=fe569913525e48e09b9526fed44a8e2b';
 
+      if (country !== '') {
+        if (country === 'us') {
+          url = 'https://newsapi.org/v2/top-headlines?country=us&apiKey=fe569913525e48e09b9526fed44a8e2b';
+        } else if (country === 'ca') {
+          url = 'https://newsapi.org/v2/top-headlines?country=ca&apiKey=fe569913525e48e09b9526fed44a8e2b';
+        }
+      }
+
       const response = await fetch(url);
       const data = await response.json();
       setNews(data.articles);
@@ -51,6 +68,28 @@ export default function App() {
       console.error('Error fetching news:', error);
     }
   };
+
+  const searchNewsByCountry = async () => {
+    try {
+      let url = '';
+  
+      if (country === 'us') {
+        url = 'https://newsapi.org/v2/top-headlines?country=us&apiKey=fe569913525e48e09b9526fed44a8e2b';
+      } else if (country === 'ca') {
+        url = 'https://newsapi.org/v2/top-headlines?country=ca&apiKey=fe569913525e48e09b9526fed44a8e2b';
+      }
+  
+     
+  
+      const response = await fetch(url);
+      const data = await response.json();
+      console.log('Fetched news:', data.articles);
+      setNews(data.articles);
+    } catch (error) {
+      console.error('Error fetching news:', error);
+    }
+  };
+
 
   const validateDate = (date) => {
     return /^\d{4}-\d{2}-\d{2}$/.test(date);
@@ -71,10 +110,15 @@ export default function App() {
       <View key={index} style={styles.articleContainer}>
         <Text style={styles.articleTitle}>{article.title}</Text>
         <Text style={styles.articleAuthor}>{article.author}</Text>
+
+       {article.urlToImage ? (
         <Image source={{ uri: article.urlToImage }} style={styles.articleImage} />
-        <Text style={styles.articleUrl} onPress={() => Linking.openURL(article.url)}>
-          {article.url}
-        </Text>
+      ) : (
+        <Image source={require('./downloadimage.png')} style={styles.articleImage} />
+      )}
+      <Text style={styles.articleUrl} onPress={() => Linking.openURL(article.url)}>
+        {article.url}
+      </Text>
       </View>
     ));
   };
@@ -113,7 +157,20 @@ export default function App() {
           value={useDateConstraints}
           onValueChange={handleToggleDateConstraints}
         />
-      
+
+<       View style={styles.inputContainer}>
+        <Text>Country:</Text>
+        <Picker
+           style={{ flex: 1 }}
+          selectedValue={country}
+          onValueChange={handleCountryChange}
+        >
+          <Picker.Item label="Select country..." value="" />
+          <Picker.Item label="Canada" value="us" />
+          <Picker.Item label="U.S.A" value="ca" />
+        </Picker>
+      </View>
+        
         <Button
           title="Search"
           onPress={searchNews}
@@ -192,4 +249,5 @@ const styles = StyleSheet.create({
     color: 'blue',
     textDecorationLine: 'underline',
   },
+  
 });
