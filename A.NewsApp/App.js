@@ -156,6 +156,12 @@ export default function App() {
         <Switch
           value={useDateConstraints}
           onValueChange={handleToggleDateConstraints}
+
+        />
+        <Button
+          title="Search"
+          onPress={searchNews}
+          disabled={!query.trim() || (useDateConstraints && (!fromDate.trim() || !toDate.trim()))}
         />
 
 <       View style={styles.inputContainer}>
@@ -171,11 +177,7 @@ export default function App() {
         </Picker>
       </View>
         
-        <Button
-          title="Search"
-          onPress={searchNews}
-          disabled={!query.trim() || (useDateConstraints && (!fromDate.trim() || !toDate.trim()))}
-        />
+        
       </View>
       <Button
         title="Get News"
