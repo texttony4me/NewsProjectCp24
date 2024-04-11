@@ -50,11 +50,11 @@ export default function App() {
   return (
     <NavigationContainer>
       <Tab.Navigator
-        tabBarOptions={{
-          activeTintColor: '#007bff',
-          inactiveTintColor: '#6c757d',
-          labelStyle: { fontSize: 16, fontWeight: 'bold' },
-          style: { backgroundColor: '#f8f9fa' },
+        screenOptions={{
+          tabBarActiveTintColor: '#007bff',
+          tabBarInactiveTintColor: '#6c757d',
+          tabBarlabelStyle: { fontSize: 16, fontWeight: 'bold' },
+          tabBarStyle: { backgroundColor: '#f8f9fa' },
         }}
       >
         <Tab.Screen name="News">
