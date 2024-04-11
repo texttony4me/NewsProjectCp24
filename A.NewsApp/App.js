@@ -168,6 +168,18 @@ function NewsScreen({ handleSave }) {
 }
 
 function FavouritesScreen({ favorites, handleDelete }) {
+  const confirmDelete = (url) => {
+    Alert.alert(
+      'Confirm Delete',
+      'Are you sure you want to delete this story?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Delete', onPress: () => handleDelete(url), style: 'destructive' },
+      ],
+      { cancelable: true }
+    );
+  };
+
   const renderFavoriteItem = ({ item }) => (
     <View style={styles.itemContainer}>
       <Text style={styles.title}>{item.title}</Text>
@@ -176,7 +188,7 @@ function FavouritesScreen({ favorites, handleDelete }) {
       <TouchableOpacity onPress={() => Linking.openURL(item.url)}>
         <Text style={styles.url}>{item.url}</Text>
       </TouchableOpacity>
-      <Button title="Delete" onPress={() => handleDelete(item.url)} color="#dc3545" />
+      <Button title="Delete" onPress={() => confirmDelete(item.url)} color="#dc3545" />
     </View>
   );
 
